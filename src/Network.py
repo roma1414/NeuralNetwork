@@ -12,7 +12,7 @@ class Network:
     # Return the output of the network if 'a' is input.
     def FeedForward(self, a):
         for b, w in zip(self.biases, self.weights):
-            a = sigmoid(np.dot(w, a) + b)
+            a = Sigmoid(np.dot(w, a) + b)
         
         return a
     
@@ -59,11 +59,11 @@ class Network:
         for b, w in zip(self.biases, self.weights):
             z = np.dot(w, activation) + b
             zs.append(z)
-            activation = sigmoid(z)
+            activation = Sigmoid(z)
             activations.append(activation)
         # backward pass
-        delta = self.cost_derivative(activations[-1], y) * \
-            sigmoidPrime(zs[-1])
+        delta = self.CostDerivative(activations[-1], y) * \
+            SigmoidPrime(zs[-1])
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
         # l = 1 means the last layer of neurons, l = 2 is the
@@ -71,23 +71,23 @@ class Network:
         # that Python can use negative indices in lists.
         for l in range(2, self.numLayers):
             z = zs[-l]
-            sp = sigmoidPrime(z)
+            sp = SigmoidPrime(z)
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
 
-    def Evaluate(self, test_data):
+    def Evaluate(self, testData):
         test_results = [(np.argmax(self.FeedForward(x)), y)
-                        for (x, y) in test_data]
+                        for (x, y) in testData]
         return sum(int(x == y) for (x, y) in test_results)
 
-    def cost_derivative(self, output_activations, y):
-        return (output_activations-y)
+    def CostDerivative(self, outputActivations, y):
+        return (outputActivations-y)
 
 # Miscellaneous functions
-def sigmoid(x):
+def Sigmoid(x):
     return 1.0 / (1.0 + np.exp(-x))
 
-def sigmoidPrime(z):
-    return sigmoid(z)*(1-sigmoid(z))
+def SigmoidPrime(z):
+    return Sigmoid(z)*(1-Sigmoid(z))
